@@ -34,11 +34,38 @@ if __name__ == '__main__':
 
 
 def parse_cookie(query: str) -> dict:
-    return {}
+    query = query.strip()
+    d = {}
+
+    if 'name=' in query:
+        query = query.split(';')
+
+        try:
+            for i in query:
+                key, value = i.split('=', 1)
+                if value:
+                    d[key] = value
+        except ValueError:
+            pass
+
+        if d.get('age'):
+            if (d.get('age')).isdigit():
+                pass
+            else:
+                d.pop('age')
+
+    return d
 
 
 if __name__ == '__main__':
     assert parse_cookie('name=Dima;') == {'name': 'Dima'}
+    assert parse_cookie('me=Dima;') == {}
+    assert parse_cookie('name=123;') == {'name': '123'}
     assert parse_cookie('') == {}
     assert parse_cookie('name=Dima;age=28;') == {'name': 'Dima', 'age': '28'}
+    assert parse_cookie('name=Dima;age=28+12;') == {'name': 'Dima'}
+    assert parse_cookie('name=Dima;age=DDDDD;') == {'name': 'Dima'}
+    assert parse_cookie('name=;age=;') == {}
     assert parse_cookie('name=Dima=User;age=28;') == {'name': 'Dima=User', 'age': '28'}
+    assert parse_cookie('name=Dima=User;age=28=12;') == {'name': 'Dima=User'}
+    assert parse_cookie('=////====') == {}
